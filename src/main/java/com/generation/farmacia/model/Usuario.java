@@ -1,16 +1,20 @@
 package com.generation.farmacia.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -21,23 +25,33 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull(message = "O Atributo Nome é Obrigatório!")
+	@NotBlank(message = "O atributo nome é obrigatório")
 	private String nome;
+	
 
-	@NotNull(message = "O Atributo Usuário é Obrigatório!")
-	@Email(message = "O Atributo Usuário deve ser um email válido!")
+	@Schema(example = "email@email.com.br")
+	@NotBlank(message = "O atributo usuario é obrigatório")
+	@Email(message = "O atributo Usuario tem que receber um e-mail válido")
 	private String usuario;
 
-	@NotBlank(message = "O Atributo Senha é Obrigatório!")
-	@Size(min = 8, message = "A Senha deve ter no mínimo 8 caracteres")
+	@NotBlank(message = "O atributo senha é obrigatório")
+	@Size(min = 6, message = "A senha tem que ter no mínimo 6 caracteres")
 	private String senha;
-
-	@Size(max = 5000, message = "O link da foto não pode ser maior do que 5000 caracteres")
-	private String foto;
 	
-	@ManyToOne
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario", cascade = CascadeType.REMOVE)
 	@JsonIgnoreProperties("usuario")
-	private Categoria categoria;
+	private List<Produto> produto;
+	
+	public Usuario(Long id, String nome, String usuario, String senha, List<Produto> produto) {
+		this.id = id;
+		this.nome = nome;
+		this.usuario = usuario;
+		this.senha = senha;
+		this.produto = produto;
+	}
+	
+	public Usuario() { }
 
 	public Long getId() {
 		return id;
@@ -71,11 +85,13 @@ public class Usuario {
 		this.senha = senha;
 	}
 
-	public String getFoto() {
-		return foto;
+
+	public List<Produto> getProduto() {
+		return produto;
 	}
 
-	public void setFoto(String foto) {
-		this.foto = foto;
+	public void setProduto(List<Produto> postagem) {
+		this.produto = postagem;
 	}
+
 }
